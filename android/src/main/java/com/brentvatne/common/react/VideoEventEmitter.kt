@@ -43,7 +43,8 @@ enum class EventTypes(val eventName: String) {
     EVENT_TEXT_TRACK_DATA_CHANGED("onTextTrackDataChanged"),
     EVENT_VIDEO_TRACKS("onVideoTracks"),
     EVENT_ON_RECEIVE_AD_EVENT("onReceiveAdEvent"),
-    EVENT_PICTURE_IN_PICTURE_STATUS_CHANGED("onPictureInPictureStatusChanged");
+    EVENT_PICTURE_IN_PICTURE_STATUS_CHANGED("onPictureInPictureStatusChanged"),
+    EVENT_ON_NOTIFICATION_CONTROL_COMMAND("onNotificationControlCommand");
 
     companion object {
         fun toMap() =
@@ -92,6 +93,7 @@ class VideoEventEmitter {
     lateinit var onTextTrackDataChanged: (textTrackData: String) -> Unit
     lateinit var onReceiveAdEvent: (adEvent: String, adData: Map<String?, String?>?) -> Unit
     lateinit var onPictureInPictureStatusChanged: (isActive: Boolean) -> Unit
+    lateinit var onNotificationControlCommand: (eventType: String, targetTime: Long?) -> Unit
 
     fun addEventEmitters(reactContext: ThemedReactContext, view: ReactExoplayerView) {
         val dispatcher = UIManagerHelper.getEventDispatcherForReactTag(reactContext, view.id)
@@ -307,6 +309,15 @@ class VideoEventEmitter {
             onPictureInPictureStatusChanged = { isActive ->
                 event.dispatch(EventTypes.EVENT_PICTURE_IN_PICTURE_STATUS_CHANGED) {
                     putBoolean("isActive", isActive)
+                }
+            }
+            onNotificationControlCommand = { eventType, targetTime ->
+                event.dispatch(EventTypes.EVENT_ON_NOTIFICATION_CONTROL_COMMAND) {
+                    putString("eventType", eventType)
+                    if (targetTime != null) {
+                        putDouble("targetTime", targetTime / 1000.0)
+                    }
+
                 }
             }
         }

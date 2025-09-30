@@ -50,7 +50,7 @@ class VideoPlaybackService : MediaSessionService() {
 
     // Player Registry
 
-    fun registerPlayer(player: ExoPlayer, from: Class<Activity>) {
+    fun registerPlayer(player: ExoPlayer, from: Class<Activity>, commandCallback: ((eventType: String, targetTime: Long?) -> Unit)?) {
         if (mediaSessionsList.containsKey(player)) {
             return
         }
@@ -59,6 +59,7 @@ class VideoPlaybackService : MediaSessionService() {
         val mediaSession = MediaSession.Builder(this, player)
             .setId("RNVideoPlaybackService_" + player.hashCode())
             .setCallback(VideoPlaybackCallback())
+            .setCallback(VideoPlaybackCallback(commandCallback))
             .setCustomLayout(immutableListOf(seekForwardBtn, seekBackwardBtn))
             .build()
 
@@ -273,7 +274,7 @@ class VideoPlaybackService : MediaSessionService() {
     }
 
     companion object {
-        private const val SEEK_INTERVAL_MS = 10000L
+        const val SEEK_INTERVAL_MS = 10000L
         private const val TAG = "VideoPlaybackService"
         private const val PLACEHOLDER_NOTIFICATION_ID = 9999
 
