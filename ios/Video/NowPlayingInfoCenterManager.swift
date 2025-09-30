@@ -20,6 +20,9 @@ class NowPlayingInfoCenterManager {
     private var seekTarget: Any?
     private var togglePlayPauseTarget: Any?
 
+    private var notificationControlCallback: RCTDirectEventBlock?
+
+
     private let remoteCommandCenter = MPRemoteCommandCenter.shared()
 
     var receivingRemoveControlEvents = false {
@@ -32,6 +35,10 @@ class NowPlayingInfoCenterManager {
                 AudioSessionManager.shared.setRemoteControlEventsActive(false)
             }
         }
+    }
+
+    func registerCallback(notificationCommandCallback: @escaping RCTDirectEventBlock) {
+        self.notificationControlCallback = notificationCommandCallback;
     }
 
     deinit {
@@ -127,6 +134,7 @@ class NowPlayingInfoCenterManager {
 
             if player.rate == 0 {
                 player.play()
+                self.notificationControlCallback?(["eventType": "play"])
             }
 
             return .success
@@ -139,6 +147,7 @@ class NowPlayingInfoCenterManager {
 
             if player.rate != 0 {
                 player.pause()
+                self.notificationControlCallback?(["eventType": "pause"])
             }
 
             return .success
@@ -150,6 +159,10 @@ class NowPlayingInfoCenterManager {
             }
             let newTime = player.currentTime() - CMTime(seconds: self.SEEK_INTERVAL_SECONDS, preferredTimescale: .max)
             player.seek(to: newTime)
+            self.notificationControlCallback?([
+                "eventType": "skipBackward",
+                "targetTime": NSNumber(value: Float(CMTimeGetSeconds(newTime)))
+            ])
             return .success
         }
 
@@ -160,6 +173,10 @@ class NowPlayingInfoCenterManager {
 
             let newTime = player.currentTime() + CMTime(seconds: self.SEEK_INTERVAL_SECONDS, preferredTimescale: .max)
             player.seek(to: newTime)
+            self.notificationControlCallback?([
+                "eventType": "skipForward",
+                "targetTime": NSNumber(value: Float(CMTimeGetSeconds(newTime)))
+            ])
             return .success
         }
 
@@ -169,6 +186,10 @@ class NowPlayingInfoCenterManager {
             }
             if let event = event as? MPChangePlaybackPositionCommandEvent {
                 player.seek(to: CMTime(seconds: event.positionTime, preferredTimescale: .max))
+                self.notificationControlCallback?([
+                    "eventType": "playbackPositionChanged",
+                    "targetTime": NSNumber(value: Float(CMTimeGetSeconds(CMTime(seconds: event.positionTime, preferredTimescale: .max))))
+                ])
                 return .success
             }
             return .commandFailed
@@ -182,8 +203,10 @@ class NowPlayingInfoCenterManager {
 
             if player.rate == 0 {
                 player.play()
+                self.notificationControlCallback?(["eventType": "play"])
             } else {
                 player.pause()
+                self.notificationControlCallback?(["eventType": "pause"])
             }
 
             return .success

@@ -135,6 +135,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     @objc var onTextTracks: RCTDirectEventBlock?
     @objc var onAudioTracks: RCTDirectEventBlock?
     @objc var onTextTrackDataChanged: RCTDirectEventBlock?
+    @objc var onNotificationControlCommand: RCTDirectEventBlock?
 
     @objc
     func _onPictureInPictureEnter() {
@@ -585,6 +586,9 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             if _showNotificationControls {
                 // We need to register player after we set current item and only for init
                 NowPlayingInfoCenterManager.shared.registerPlayer(player: _player!)
+                if (self.onNotificationControlCommand != nil) {
+                    NowPlayingInfoCenterManager.shared.registerCallback(notificationCommandCallback: self.onNotificationControlCommand!);
+                }
             }
         } else {
             #if !os(tvOS) && !os(visionOS)
