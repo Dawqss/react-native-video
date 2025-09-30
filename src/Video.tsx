@@ -38,6 +38,7 @@ import type {
   OnVideoErrorData,
   OnVideoTracksData,
   VideoSrc,
+  OnNotificationControlCommandData
 } from './specs/VideoNativeComponent';
 import {
   generateHeaderForNative,
@@ -106,6 +107,7 @@ const Video = forwardRef<VideoRef, ReactVideoProps>(
       onTextTrackDataChanged,
       onVideoTracks,
       onAspectRatio,
+      onNotificationControlCommand,
       localSourceEncryptionKeyScheme,
       minLoadRetryCount,
       bufferConfig,
@@ -635,6 +637,13 @@ const Video = forwardRef<VideoRef, ReactVideoProps>(
       [onControlsVisibilityChange],
     );
 
+    const _onNotificationControlCommand = useCallback(
+      (e: NativeSyntheticEvent<OnNotificationControlCommandData>)=> {
+        onNotificationControlCommand?.(e.nativeEvent as OnNotificationControlCommandData);
+      },
+      [onNotificationControlCommand]
+    )
+
     const selectedDrm = source?.drm || drm;
     const usingExternalGetLicense = selectedDrm?.getLicense instanceof Function;
 
@@ -903,6 +912,9 @@ const Video = forwardRef<VideoRef, ReactVideoProps>(
           }
           onControlsVisibilityChange={
             onControlsVisibilityChange ? _onControlsVisibilityChange : undefined
+          }
+          onNotificationControlCommand={
+            onNotificationControlCommand ? _onNotificationControlCommand : undefined
           }
           viewType={_viewType}
         />

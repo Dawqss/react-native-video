@@ -327,6 +327,11 @@ export type OnControlsVisibilityChange = Readonly<{
   isVisible: boolean;
 }>;
 
+export type OnNotificationControlCommandData = Readonly<{
+  eventType: string;
+  targetTime?: Float;
+}>
+
 export interface VideoNativeProps extends ViewProps {
   src?: VideoSrc;
   allowsExternalPlayback?: boolean; // ios, true
@@ -402,6 +407,7 @@ export interface VideoNativeProps extends ViewProps {
   onTextTracks?: DirectEventHandler<OnTextTracksData>; // android
   onTextTrackDataChanged?: DirectEventHandler<OnTextTrackDataChangedData>; // iOS
   onVideoTracks?: DirectEventHandler<OnVideoTracksData>; // android
+  onNotificationControlCommand?: DirectEventHandler<OnNotificationControlCommandData>; // iOS, android
 }
 
 type NativeVideoComponentType = HostComponent<VideoNativeProps>;

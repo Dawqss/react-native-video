@@ -234,6 +234,21 @@ export type OnReceiveAdEventData = Readonly<{
   >;
 }>;
 
+
+
+export enum NotificationControlCommandEvents {
+  PLAY = 'play',
+  PAUSE = 'pause',
+  PLAYBACK_POSITION_CHANGED = 'playbackPositionChanged',
+  SKIP_FORWARD = 'skipForward',
+  SKIP_BACKWARD = 'skipBackward'
+}
+
+export type OnNotificationControlCommandData = Readonly<{
+  eventType: NotificationControlCommandEvents;
+  targetTime?: number;
+}>;
+
 export interface ReactVideoEvents {
   onAudioBecomingNoisy?: () => void; //Android, iOS
   onAudioFocusChanged?: (e: OnAudioFocusChangedData) => void; // Android
@@ -267,4 +282,5 @@ export interface ReactVideoEvents {
   onTextTrackDataChanged?: (e: OnTextTrackDataChangedData) => void; // iOS
   onVideoTracks?: (e: OnVideoTracksData) => void; //Android
   onAspectRatio?: (e: OnVideoAspectRatioData) => void;
+  onNotificationControlCommand?: (e: OnNotificationControlCommandData) => void // Android, iOS
 }
